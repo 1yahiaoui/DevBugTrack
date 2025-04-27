@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevBugTrack - New Ticket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS for elements that need more specific styling */
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+
+        .toast {
+            animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .ticket-preview {
+            border-left: 4px solid #4f46e5;
+        }
+
+        .tox-tinymce {
+            border-radius: 0.5rem !important;
+            border-color: #d1d5db !important;
+        }
+
+        .tox .tox-statusbar {
+            display: none !important;
+        }
+    </style>
+    <!-- TinyMCE Rich Text Editor -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Main Container -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-indigo-800 text-white w-64 flex flex-col">
+            <div class="p-4 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-bug text-white text-xl"></i>
+                </div>
+                <span class="logo-text text-xl font-bold">DevBugTrack</span>
+                <button id="toggleSidebar" class="ml-auto text-white focus:outline-none lg:hidden">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="px-4 py-2">
+                <div class="relative">
+                    <input type="text" placeholder="Search..."
+                        class="w-full bg-indigo-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-indigo-300">
+                    <i class="fas fa-search absolute right-3 top-3 text-indigo-300"></i>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto mt-4">
+                <div class="px-2">
+                    <div class="py-2 text-indigo-300 uppercase text-xs font-semibold px-4">Main</div>
+                    <a href="dashboard.html"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="tickets.html"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-list-ul mr-3"></i>
+                        <span class="nav-text">Tickets</span>
+                    </a>
+                    <a href="modules.html"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-cubes mr-3"></i>
+                        <span class="nav-text">Modules</span>
+                    </a>
+                    <a href="new-ticket.html"
+                        class="flex items-center px-4 py-3 text-white bg-indigo-900 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-plus-circle mr-3"></i>
+                        <span class="nav-text">New Ticket</span>
+                    </a>
+                </div>
+                <div class="px-2 mt-6">
+                    <div class="py-2 text-indigo-300 uppercase text-xs font-semibold px-4">Modules</div>
+                    <a href="#"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-boxes mr-3"></i>
+                        <span class="nav-text">Inventory</span>
+                        <span class="ml-auto bg-indigo-600 text-xs px-2 py-1 rounded-full">3</span>
+                    </a>
+                    <a href="#"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="nav-text">GMAO</span>
+                        <span class="ml-auto bg-indigo-600 text-xs px-2 py-1 rounded-full">5</span>
+                    </a>
+                    <a href="#"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-building mr-3"></i>
+                        <span class="nav-text">GFAO</span>
+                        <span class="ml-auto bg-indigo-600 text-xs px-2 py-1 rounded-full">2</span>
+                    </a>
+                    <a href="#"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-chart-line mr-3"></i>
+                        <span class="nav-text">Analytics</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="p-4 border-t border-indigo-700">
+                <div class="flex items-center">
+                    <img src="https://img.freepik.com/free-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg"
+                        alt="User" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <div class="font-medium">Yahiaoui Younes</div>
+                        <div class="text-xs text-indigo-300">Admin</div>
+                    </div>
+                    <button class="ml-auto text-indigo-300 hover:text-white">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button id="mobileToggleSidebar" class="text-gray-500 mr-4 focus:outline-none lg:hidden">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 class="text-xl font-semibold text-gray-800">New Ticket</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span
+                                class="absolute -mt-2 -mr-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        </button>
+                        <div class="relative">
+                            <button id="userMenuButton" class="flex items-center focus:outline-none">
+                                <img src="https://img.freepik.com/free-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg"
+                                    alt="User" class="w-8 h-8 rounded-full">
+                                <span class="ml-2 text-gray-700 hidden md:inline">Younes</span>
+                                <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                            </button>
+                            <div id="userMenu"
+                                class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your
+                                    Profile</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content - New Ticket -->
+            <main class="p-6">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- Ticket Form -->
+                    <div class="lg:w-2/3">
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200">
+                                <h2 class="text-lg font-semibold text-gray-800">Create New Ticket</h2>
+                            </div>
+                            <form id="ticketForm" class="p-6">
+                                <div class="grid grid-cols-1 gap-6">
+                                    <!-- Ticket Title -->
+                                    <div>
+                                        <label for="ticketTitle"
+                                            class="block text-sm font-medium text-gray-700 mb-1">Ticket Title</label>
+                                        <input type="text" id="ticketTitle"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                            placeholder="Brief description of the issue" required>
+                                    </div>
+
+                                    <!-- Module and Priority -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Module Selection -->
+                                        <div>
+                                            <label for="ticketModule"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Module</label>
+                                            <select id="ticketModule"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                                required>
+                                                <option value="">Select a module</option>
+                                                <option value="inventory">Inventory</option>
+                                                <option value="gmao">GMAO</option>
+                                                <option value="gfao">GFAO</option>
+                                                <option value="analytics">Analytics</option>
+                                                <option value="hr">HR Management</option>
+                                                <option value="accounting">Accounting</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Priority -->
+                                        <div>
+                                            <label for="ticketPriority"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                            <select id="ticketPriority"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                                required>
+                                                <option value="low">Low</option>
+                                                <option value="medium" selected>Medium</option>
+                                                <option value="high">High</option>
+                                                <option value="critical">Critical</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Type and Status -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Type -->
+                                        <div>
+                                            <label for="ticketType"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                            <select id="ticketType"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                                required>
+                                                <option value="bug">Bug</option>
+                                                <option value="feature">Feature Request</option>
+                                                <option value="improvement">Improvement</option>
+                                                <option value="task">Task</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Status -->
+                                        <div>
+                                            <label for="ticketStatus"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                            <select id="ticketStatus"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                                required>
+                                                <option value="open">Open</option>
+                                                <option value="in-progress">In Progress</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="resolved">Resolved</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Assignee and Due Date -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Assignee -->
+                                        <div>
+                                            <label for="ticketAssignee"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
+                                            <select id="ticketAssignee"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                                <option value="">Unassigned</option>
+                                                <option value="younes" selected>Yahiaoui Younes</option>
+                                                <option value="sarah">Sarah Johnson</option>
+                                                <option value="michael">Michael Brown</option>
+                                                <option value="emma">Emma Wilson</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Due Date -->
+                                        <div>
+                                            <label for="ticketDueDate"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                                            <input type="date" id="ticketDueDate"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div>
+                                        <label for="ticketDescription"
+                                            class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <textarea id="ticketDescription" rows="8" class="hidden"></textarea>
+                                        <div id="editor" class="border border-gray-300 rounded-lg"></div>
+                                    </div>
+
+                                    <!-- Attachments -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Attachments</label>
+                                        <div
+                                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                                            <div class="space-y-1 text-center">
+                                                <div class="flex text-sm text-gray-600">
+                                                    <label for="file-upload"
+                                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                                        <span>Upload files</span>
+                                                        <input id="file-upload" name="file-upload" type="file"
+                                                            class="sr-only" multiple>
+                                                    </label>
+                                                    <p class="pl-1">or drag and drop</p>
+                                                </div>
+                                                <p class="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Buttons -->
+                                    <div class="flex justify-end space-x-3 pt-4">
+                                        <button type="button" id="cancelTicket"
+                                            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                                        <button type="button" id="saveDraft"
+                                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Save
+                                            Draft</button>
+                                        <button type="submit"
+                                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Create
+                                            Ticket</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Ticket Preview -->
+                    <div class="lg:w-1/3">
+                        <div class="bg-white rounded-lg shadow overflow-hidden sticky top-6">
+                            <div class="px-6 py-4 border-b border-gray-200">
+                                <h2 class="text-lg font-semibold text-gray-800">Ticket Preview</h2>
+                            </div>
+                            <div class="p-6">
+                                <div id="ticketPreview" class="ticket-preview bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h3 class="font-semibold text-gray-800" id="previewTitle">Ticket Title</h3>
+                                            <p class="text-sm text-gray-500" id="previewModule">Module: Not selected</p>
+                                        </div>
+                                        <span
+                                            class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-800"
+                                            id="previewStatus">Open</span>
+                                    </div>
+
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <div>
+                                            <p class="text-xs text-gray-500">Priority</p>
+                                            <span class="text-sm font-medium" id="previewPriority">Medium</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Type</p>
+                                            <span class="text-sm font-medium" id="previewType">Bug</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Assignee</p>
+                                            <span class="text-sm font-medium" id="previewAssignee">Unassigned</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <p class="text-xs text-gray-500">Due Date</p>
+                                        <span class="text-sm font-medium" id="previewDueDate">Not set</span>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-xs text-gray-500 mb-1">Description</p>
+                                        <div class="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200"
+                                            id="previewDescription">
+                                            Ticket description will appear here...
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <p class="text-xs text-gray-500 mb-1">Attachments</p>
+                                        <div class="flex flex-wrap gap-2" id="previewAttachments">
+                                            <div class="text-xs text-gray-500">No attachments</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6">
+                                    <h3 class="text-sm font-medium text-gray-700 mb-2">Recent Similar Tickets</h3>
+                                    <div class="space-y-3">
+                                        <!-- Similar Ticket 1 -->
+                                        <div
+                                            class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                            <div class="flex justify-between">
+                                                <span class="text-sm font-medium text-indigo-600">#TKT-124</span>
+                                                <span
+                                                    class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">Resolved</span>
+                                            </div>
+                                            <p class="text-sm text-gray-700 mt-1">Inventory sync issue with barcode
+                                                scanner</p>
+                                            <p class="text-xs text-gray-500 mt-1">Created 2 days ago</p>
+                                        </div>
+
+                                        <!-- Similar Ticket 2 -->
+                                        <div
+                                            class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                            <div class="flex justify-between">
+                                                <span class="text-sm font-medium text-indigo-600">#TKT-118</span>
+                                                <span
+                                                    class="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                            </div>
+                                            <p class="text-sm text-gray-700 mt-1">GMAO maintenance scheduling error</p>
+                                            <p class="text-xs text-gray-500 mt-1">Created 1 week ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed right-5 bottom-5 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage">Ticket created successfully!</span>
+        </div>
+    </div>
+
+    <script>
+        // Initialize TinyMCE Editor
+        tinymce.init({
+            selector: '#editor',
+            plugins: 'link lists image code table emoticons',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | code | table | emoticons',
+            menubar: false,
+            height: 300,
+            setup: function (editor) {
+                editor.on('change', function () {
+                    editor.save();
+                    updatePreview();
+                });
+            }
+        });
+
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const mobileToggleSidebar = document.getElementById('mobileToggleSidebar');
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenu = document.getElementById('userMenu');
+        const ticketForm = document.getElementById('ticketForm');
+        const cancelTicket = document.getElementById('cancelTicket');
+        const saveDraft = document.getElementById('saveDraft');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const fileUpload = document.getElementById('file-upload');
+
+        // Preview elements
+        const previewTitle = document.getElementById('previewTitle');
+        const previewModule = document.getElementById('previewModule');
+        const previewStatus = document.getElementById('previewStatus');
+        const previewPriority = document.getElementById('previewPriority');
+        const previewType = document.getElementById('previewType');
+        const previewAssignee = document.getElementById('previewAssignee');
+        const previewDueDate = document.getElementById('previewDueDate');
+        const previewDescription = document.getElementById('previewDescription');
+        const previewAttachments = document.getElementById('previewAttachments');
+
+        // Form elements
+        const ticketTitle = document.getElementById('ticketTitle');
+        const ticketModule = document.getElementById('ticketModule');
+        const ticketPriority = document.getElementById('ticketPriority');
+        const ticketType = document.getElementById('ticketType');
+        const ticketStatus = document.getElementById('ticketStatus');
+        const ticketAssignee = document.getElementById('ticketAssignee');
+        const ticketDueDate = document.getElementById('ticketDueDate');
+
+        // Toggle sidebar on desktop
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        // Toggle sidebar on mobile
+        mobileToggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('block');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('z-40');
+        });
+
+        // Toggle user menu
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target) && !userMenuButton.contains(e.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+
+        // Cancel ticket creation
+        cancelTicket.addEventListener('click', () => {
+            if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                window.location.href = 'tickets.html';
+            }
+        });
+
+        // Save draft
+        saveDraft.addEventListener('click', () => {
+            // In a real app, this would save to local storage or send to server
+            toastMessage.textContent = 'Draft saved successfully!';
+            showToast();
+        });
+
+        // Handle file upload preview
+        fileUpload.addEventListener('change', function (e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                previewAttachments.innerHTML = '';
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileElement = document.createElement('div');
+                    fileElement.className = 'flex items-center p-2 bg-gray-100 rounded text-xs';
+                    fileElement.innerHTML = `
+                        <i class="fas fa-paperclip mr-2 text-gray-500"></i>
+                        <span class="truncate max-w-xs">${file.name}</span>
+                        <span class="ml-2 text-gray-500">(${(file.size / 1024).toFixed(1)}KB)</span>
+                    `;
+                    previewAttachments.appendChild(fileElement);
+                }
+            } else {
+                previewAttachments.innerHTML = '<div class="text-xs text-gray-500">No attachments</div>';
+            }
+        });
+
+        // Update preview when form changes
+        function updatePreview() {
+            // Title
+            previewTitle.textContent = ticketTitle.value || 'Ticket Title';
+
+            // Module
+            const moduleText = ticketModule.value
+                ? `Module: ${ticketModule.options[ticketModule.selectedIndex].text}`
+                : 'Module: Not selected';
+            previewModule.textContent = moduleText;
+
+            // Status
+            previewStatus.textContent = ticketStatus.options[ticketStatus.selectedIndex].text;
+
+            // Set status color based on selection
+            const statusColors = {
+                'open': 'bg-gray-200 text-gray-800',
+                'in-progress': 'bg-blue-100 text-blue-800',
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'resolved': 'bg-green-100 text-green-800'
+            };
+            previewStatus.className = `px-2 py-1 text-xs font-semibold rounded-full ${statusColors[ticketStatus.value] || 'bg-gray-200 text-gray-800'}`;
+
+            // Priority
+            previewPriority.textContent = ticketPriority.options[ticketPriority.selectedIndex].text;
+
+            // Type
+            previewType.textContent = ticketType.options[ticketType.selectedIndex].text;
+
+            // Assignee
+            previewAssignee.textContent = ticketAssignee.value
+                ? ticketAssignee.options[ticketAssignee.selectedIndex].text
+                : 'Unassigned';
+
+            // Due Date
+            if (ticketDueDate.value) {
+                const dueDate = new Date(ticketDueDate.value);
+                previewDueDate.textContent = dueDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } else {
+                previewDueDate.textContent = 'Not set';
+            }
+
+            // Description
+            const description = tinymce.get('editor').getContent();
+            previewDescription.innerHTML = description || 'Ticket description will appear here...';
+        }
+
+        // Add event listeners to form elements to update preview
+        ticketTitle.addEventListener('input', updatePreview);
+        ticketModule.addEventListener('change', updatePreview);
+        ticketPriority.addEventListener('change', updatePreview);
+        ticketType.addEventListener('change', updatePreview);
+        ticketStatus.addEventListener('change', updatePreview);
+        ticketAssignee.addEventListener('change', updatePreview);
+        ticketDueDate.addEventListener('change', updatePreview);
+
+        // Show toast notification
+        function showToast() {
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Handle form submission
+        ticketForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Here you would typically send the form data to the server
+            // For demo purposes, we'll just show a toast
+
+            // Show toast
+            toastMessage.textContent = 'Ticket created successfully!';
+            showToast();
+
+            // In a real app, you would redirect to the ticket page or clear the form
+            // window.location.href = `ticket.html?id=${newTicketId}`;
+
+            // For demo, just reset the form
+            ticketForm.reset();
+            tinymce.get('editor').setContent('');
+            updatePreview();
+        });
+
+        // Initialize preview
+        updatePreview();
+    </script>
+</body>
+
+</html>

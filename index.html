@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevBugTrack - Bug Tracking System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS for elements that need more specific styling */
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+
+        .ticket-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            min-width: 80px;
+        }
+
+        .screenshot-preview {
+            max-height: 200px;
+            object-fit: contain;
+        }
+
+        .toast {
+            animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Main Container -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-indigo-800 text-white w-64 flex flex-col">
+            <div class="p-4 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-bug text-white text-xl"></i>
+                </div>
+                <span class="logo-text text-xl font-bold">DevBugTrack</span>
+                <button id="toggleSidebar" class="ml-auto text-white focus:outline-none lg:hidden">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="px-4 py-2">
+                <div class="relative">
+                    <input type="text" placeholder="Search..."
+                        class="w-full bg-indigo-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-indigo-300">
+                    <i class="fas fa-search absolute right-3 top-3 text-indigo-300"></i>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto mt-4">
+                <div class="px-2">
+                    <div class="py-2 text-indigo-300 uppercase text-xs font-semibold px-4">Main</div>
+                    <a href="#" class="flex items-center px-4 py-3 text-white bg-indigo-900 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="tickets.html"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-list-ul mr-3"></i>
+                        <span class="nav-text">Tickets</span>
+                    </a>
+                    <a href="modules.html"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-cubes mr-3"></i>
+                        <span class="nav-text">Modules</span>
+                    </a>
+                    <a href="addtickets.html"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-plus-circle mr-3"></i>
+                        <span class="nav-text">New Ticket</span>
+                    </a>
+                </div>
+                <div class="px-2 mt-6">
+                    <div class="py-2 text-indigo-300 uppercase text-xs font-semibold px-4">Modules</div>
+                    <a href="#"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-boxes mr-3"></i>
+                        <span class="nav-text">Inventory</span>
+                        <span class="ml-auto bg-indigo-600 text-xs px-2 py-1 rounded-full">3</span>
+                    </a>
+                    <a href="#"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="nav-text">GMAO</span>
+                        <span class="ml-auto bg-indigo-600 text-xs px-2 py-1 rounded-full">5</span>
+                    </a>
+                    <a href="#"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-building mr-3"></i>
+                        <span class="nav-text">GFAO</span>
+                        <span class="ml-auto bg-indigo-600 text-xs px-2 py-1 rounded-full">2</span>
+                    </a>
+                    <a href="#"
+                        class="flex items-center px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-700 rounded-lg mx-2 mb-1">
+                        <i class="fas fa-chart-line mr-3"></i>
+                        <span class="nav-text">Analytics</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="p-4 border-t border-indigo-700">
+                <div class="flex items-center">
+                    <img src="https://img.freepik.com/free-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg"
+                        alt="User" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <div class="font-medium">Yahiaoui Younes</div>
+                        <div class="text-xs text-indigo-300">Admin</div>
+                    </div>
+                    <button class="ml-auto text-indigo-300 hover:text-white">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button id="mobileToggleSidebar" class="text-gray-500 mr-4 focus:outline-none lg:hidden">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 class="text-xl font-semibold text-gray-800">Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span
+                                class="absolute -mt-2 -mr-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        </button>
+                        <div class="relative">
+                            <button id="userMenuButton" class="flex items-center focus:outline-none">
+                                <img src="https://img.freepik.com/free-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg"
+                                    alt="User" class="w-8 h-8 rounded-full">
+                                <span class="ml-2 text-gray-700 hidden md:inline">Younes</span>
+                                <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                            </button>
+                            <div id="userMenu"
+                                class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your
+                                    Profile</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content - Dashboard -->
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                                <i class="fas fa-exclamation-circle text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Open Tickets</p>
+                                <h3 class="text-2xl font-bold text-gray-800">12</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                                <i class="fas fa-clock text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Pending Tickets</p>
+                                <h3 class="text-2xl font-bold text-gray-800">8</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                <i class="fas fa-check-circle text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Closed Tickets</p>
+                                <h3 class="text-2xl font-bold text-gray-800">24</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity and Quick Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200">
+                                <h2 class="text-lg font-semibold text-gray-800">Recent Tickets</h2>
+                            </div>
+                            <div class="divide-y divide-gray-200">
+                                <!-- Ticket Item -->
+                                <div class="p-4 hover:bg-gray-50 cursor-pointer ticket-card transition duration-200">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 pt-1">
+                                            <div
+                                                class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                <i class="fas fa-bug text-indigo-600"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4 flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-md font-medium text-gray-900">Inventory items not
+                                                    syncing</h3>
+                                                <span
+                                                    class="status-badge bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Open</span>
+                                            </div>
+                                            <p class="mt-1 text-sm text-gray-500">Items added to inventory are not
+                                                appearing in the dashboard...</p>
+                                            <div class="mt-2 flex items-center text-sm text-gray-500">
+                                                <span class="flex items-center">
+                                                    <i class="fas fa-cube mr-1 text-indigo-500"></i>
+                                                    Inventory
+                                                </span>
+                                                <span class="ml-4 flex items-center">
+                                                    <i class="fas fa-user mr-1 text-indigo-500"></i>
+                                                    John D.
+                                                </span>
+                                                <span class="ml-4 flex items-center">
+                                                    <i class="fas fa-calendar-alt mr-1 text-indigo-500"></i>
+                                                    2 hours ago
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Ticket Item -->
+                                <div class="p-4 hover:bg-gray-50 cursor-pointer ticket-card transition duration-200">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 pt-1">
+                                            <div
+                                                class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                <i class="fas fa-bug text-indigo-600"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4 flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-md font-medium text-gray-900">GMAO reports not
+                                                    generating</h3>
+                                                <span
+                                                    class="status-badge bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Pending</span>
+                                            </div>
+                                            <p class="mt-1 text-sm text-gray-500">Weekly maintenance reports fail to
+                                                generate when selecting date range...</p>
+                                            <div class="mt-2 flex items-center text-sm text-gray-500">
+                                                <span class="flex items-center">
+                                                    <i class="fas fa-tools mr-1 text-indigo-500"></i>
+                                                    GMAO
+                                                </span>
+                                                <span class="ml-4 flex items-center">
+                                                    <i class="fas fa-user mr-1 text-indigo-500"></i>
+                                                    Maria S.
+                                                </span>
+                                                <span class="ml-4 flex items-center">
+                                                    <i class="fas fa-calendar-alt mr-1 text-indigo-500"></i>
+                                                    1 day ago
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Ticket Item -->
+                                <div class="p-4 hover:bg-gray-50 cursor-pointer ticket-card transition duration-200">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 pt-1">
+                                            <div
+                                                class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                <i class="fas fa-bug text-indigo-600"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4 flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-md font-medium text-gray-900">Dashboard charts not
+                                                    loading</h3>
+                                                <span
+                                                    class="status-badge bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Closed</span>
+                                            </div>
+                                            <p class="mt-1 text-sm text-gray-500">Fixed the issue with dashboard charts
+                                                not loading for users with...</p>
+                                            <div class="mt-2 flex items-center text-sm text-gray-500">
+                                                <span class="flex items-center">
+                                                    <i class="fas fa-chart-line mr-1 text-indigo-500"></i>
+                                                    Analytics
+                                                </span>
+                                                <span class="ml-4 flex items-center">
+                                                    <i class="fas fa-user mr-1 text-indigo-500"></i>
+                                                    Alex T.
+                                                </span>
+                                                <span class="ml-4 flex items-center">
+                                                    <i class="fas fa-calendar-alt mr-1 text-indigo-500"></i>
+                                                    3 days ago
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                                <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">View all
+                                    tickets</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200">
+                                <h2 class="text-lg font-semibold text-gray-800">Quick Actions</h2>
+                            </div>
+                            <div class="p-6">
+                                <button id="newTicketBtn"
+                                    class="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150">
+                                    <i class="fas fa-plus-circle mr-2"></i>
+                                    Create New Ticket
+                                </button>
+                                <div class="mt-6">
+                                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Modules
+                                    </h3>
+                                    <div class="space-y-3">
+                                        <a href="#"
+                                            class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-150">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                                <i class="fas fa-boxes text-indigo-600"></i>
+                                            </div>
+                                            <span class="font-medium text-gray-800">Inventory</span>
+                                            <span
+                                                class="ml-auto bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-1 rounded-full">3</span>
+                                        </a>
+                                        <a href="#"
+                                            class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-150">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                                <i class="fas fa-tools text-indigo-600"></i>
+                                            </div>
+                                            <span class="font-medium text-gray-800">GMAO</span>
+                                            <span
+                                                class="ml-auto bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-1 rounded-full">5</span>
+                                        </a>
+                                        <a href="#"
+                                            class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-150">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                                <i class="fas fa-building text-indigo-600"></i>
+                                            </div>
+                                            <span class="font-medium text-gray-800">GFAO</span>
+                                            <span
+                                                class="ml-auto bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-1 rounded-full">2</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
+                    </div>
+                    <div class="divide-y divide-gray-200">
+                        <!-- Activity Item -->
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User"
+                                        class="w-10 h-10 rounded-full">
+                                </div>
+                                <div class="ml-4">
+                                    <div class="flex items-center">
+                                        <p class="text-sm font-medium text-gray-900">Michael Brown</p>
+                                        <span class="ml-2 text-xs text-gray-500">2 hours ago</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Added a reply to ticket <a href="#"
+                                            class="text-indigo-600 hover:underline">#INV-245</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Activity Item -->
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <img src="https://img.freepik.com/free-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg"
+                                        alt="User" class="w-10 h-10 rounded-full">
+                                </div>
+                                <div class="ml-4">
+                                    <div class="flex items-center">
+                                        <p class="text-sm font-medium text-gray-900">Yahiaoui Younes</p>
+                                        <span class="ml-2 text-xs text-gray-500">4 hours ago</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Closed ticket <a href="#"
+                                            class="text-indigo-600 hover:underline">#GMAO-189</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Activity Item -->
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User"
+                                        class="w-10 h-10 rounded-full">
+                                </div>
+                                <div class="ml-4">
+                                    <div class="flex items-center">
+                                        <p class="text-sm font-medium text-gray-900">David Wilson</p>
+                                        <span class="ml-2 text-xs text-gray-500">1 day ago</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Created new ticket <a href="#"
+                                            class="text-indigo-600 hover:underline">#GFAO-056</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- New Ticket Modal -->
+    <div id="newTicketModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center pb-3 border-b">
+                <h3 class="text-xl font-semibold text-gray-800">Create New Ticket</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="ticketForm" class="mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="col-span-2">
+                        <label for="ticketTitle" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <input type="text" id="ticketTitle"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Brief description of the issue" required>
+                    </div>
+                    <div>
+                        <label for="ticketModule" class="block text-sm font-medium text-gray-700 mb-1">Module</label>
+                        <select id="ticketModule"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                            required>
+                            <option value="">Select a module</option>
+                            <option value="inventory">Inventory</option>
+                            <option value="gmao">GMAO</option>
+                            <option value="gfao">GFAO</option>
+                            <option value="analytics">Analytics</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ticketPriority"
+                            class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                        <select id="ticketPriority"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label for="ticketDescription"
+                            class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="ticketDescription" rows="4"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Detailed description of the issue..." required></textarea>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Screenshots</label>
+                        <div
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
+                                    viewBox="0 0 48 48" aria-hidden="true">
+                                    <path
+                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="file-upload"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                        <span>Upload a file</span>
+                                        <input id="file-upload" name="file-upload" type="file" class="sr-only"
+                                            accept="image/*">
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                        </div>
+                        <div id="imagePreview" class="mt-2 hidden">
+                            <img id="previewImage" src="#" alt="Preview"
+                                class="screenshot-preview max-w-full rounded-lg border border-gray-300">
+                            <button id="removeImage" type="button"
+                                class="mt-2 text-sm text-red-600 hover:text-red-800">Remove image</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" id="cancelTicket"
+                        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit
+                        Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed right-5 bottom-5 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg toast">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage">Ticket created successfully!</span>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const mobileToggleSidebar = document.getElementById('mobileToggleSidebar');
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenu = document.getElementById('userMenu');
+        const newTicketBtn = document.getElementById('newTicketBtn');
+        const newTicketModal = document.getElementById('newTicketModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelTicket = document.getElementById('cancelTicket');
+        const ticketForm = document.getElementById('ticketForm');
+        const fileUpload = document.getElementById('file-upload');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const removeImage = document.getElementById('removeImage');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+
+        // Toggle sidebar on desktop
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        // Toggle sidebar on mobile
+        mobileToggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('block');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('z-40');
+        });
+
+        // Toggle user menu
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target) && !userMenuButton.contains(e.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+
+        // Show new ticket modal
+        newTicketBtn.addEventListener('click', () => {
+            newTicketModal.classList.remove('hidden');
+        });
+
+        // Close modal
+        function closeTicketModal() {
+            newTicketModal.classList.add('hidden');
+        }
+
+        closeModal.addEventListener('click', closeTicketModal);
+        cancelTicket.addEventListener('click', closeTicketModal);
+
+        // Handle file upload preview
+        fileUpload.addEventListener('change', function (e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    previewImage.src = event.target.result;
+                    imagePreview.classList.remove('hidden');
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Remove image preview
+        removeImage.addEventListener('click', function () {
+            fileUpload.value = '';
+            previewImage.src = '#';
+            imagePreview.classList.add('hidden');
+        });
+
+        // Handle form submission
+        ticketForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Here you would typically send the form data to the server
+            // For demo purposes, we'll just show a toast and close the modal
+
+            // Show toast
+            toastMessage.textContent = 'Ticket created successfully!';
+            toast.classList.remove('hidden');
+            toast.classList.add('bg-green-500');
+
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+
+            // Close modal and reset form
+            closeTicketModal();
+            ticketForm.reset();
+            previewImage.src = '#';
+            imagePreview.classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === newTicketModal) {
+                closeTicketModal();
+            }
+        });
+    </script>
+</body>
+
+</html>
